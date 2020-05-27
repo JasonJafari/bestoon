@@ -10,6 +10,8 @@ from datetime import datetime
 
 
 # Create your views here.
+
+
 @csrf_exempt
 def submit_expense(request):
     """ submit an expense"""
@@ -21,6 +23,24 @@ def submit_expense(request):
 
     this_user = User.objects.filter(token__token=this_token).get()
     Expense.objects.create(user=this_user, amount=request.POST['amount'],
+                           text=request.POST['text'], date=date)
+
+    return JsonResponse({
+        'status': 'ok',
+    }, encoder=json.JSONEncoder)
+
+
+@csrf_exempt
+def submit_income(request):
+    """ submit an income"""
+    # TODO; validate data. user mightbe fake
+    this_token = request.POST['token']
+
+    if 'date' not in request.POST:
+        date = datetime.now()  # TODO: user might want to submit the data herself
+
+    this_user = User.objects.filter(token__token=this_token).get()
+    Income.objects.create(user=this_user, amount=request.POST['amount'],
                            text=request.POST['text'], date=date)
 
     return JsonResponse({
